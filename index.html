@@ -9,117 +9,133 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-[#09090b] text-[#zinc-100] min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
 
-    <!-- Cabeçalho -->
-    <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center gap-3">
+    <!-- Cabeçalho estilo Shadcn -->
+    <header class="bg-[#09090b]/80 backdrop-blur-md border-b border-[#27272a] p-3 sm:p-4 sticky top-0 z-40 flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center space-x-3">
-            <div class="bg-indigo-600 p-2 rounded-lg text-white">
-                <i class="fa-solid fa-code text-lg sm:text-xl"></i>
+            <div class="bg-white text-black p-2 rounded-md font-bold shadow-sm flex items-center justify-center">
+                <i class="fa-solid fa-code text-base sm:text-lg"></i>
             </div>
             <div>
-                <h1 class="text-lg sm:text-xl font-bold tracking-wide">Dev<span class="text-indigo-400">Kanban</span></h1>
-                <p id="sync-status" class="text-[10px] text-amber-400">Conectando ao Supabase...</p>
+                <h1 class="text-base sm:text-lg font-semibold tracking-tight text-white">Dev<span class="text-indigo-400">Kanban</span></h1>
+                <p id="sync-status" class="text-[10px] text-amber-400 font-medium">Conectando ao Supabase...</p>
             </div>
         </div>
-        <div class="flex items-center space-x-2 sm:space-x-3">
-            <button onclick="abrirModalConfigColunas()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm transition flex items-center space-x-1.5">
-                <i class="fa-solid fa-columns"></i>
+        <div class="flex items-center space-x-2 sm:space-x-2.5">
+            <button onclick="abrirModalConfigColunas()" class="bg-[#27272a] hover:bg-[#3f3f46] text-zinc-200 px-3 py-2 rounded-md font-medium text-xs sm:text-sm transition border border-[#3f3f46]/50 flex items-center space-x-1.5 shadow-xs">
+                <i class="fa-solid fa-columns text-zinc-400"></i>
                 <span class="hidden xs:inline">Colunas</span>
             </button>
-            <button onclick="abrirModalProjeto()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/30">
-                <i class="fa-solid fa-plus"></i>
+            <button onclick="abrirModalProjeto()" class="bg-white hover:bg-zinc-200 text-zinc-900 px-3 sm:px-4 py-2 rounded-md font-medium text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-sm">
+                <i class="fa-solid fa-plus text-xs"></i>
                 <span>Novo Projeto</span>
             </button>
         </div>
     </header>
 
     <!-- Navegação por Abas -->
-    <nav class="bg-slate-800/50 border-b border-slate-700 px-3 sm:px-4 pt-3 flex justify-between items-center overflow-x-auto">
+    <nav class="bg-[#09090b] border-b border-[#27272a] px-3 sm:px-6 pt-3 flex justify-between items-center overflow-x-auto">
         <div id="container-abas" class="flex space-x-2 pb-2"></div>
-        <button onclick="abrirModalAba()" class="text-slate-400 hover:text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1 whitespace-nowrap mb-2 ml-2">
+        <button onclick="abrirModalAba()" class="text-zinc-400 hover:text-zinc-200 bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] px-3 py-1.5 rounded-md text-xs sm:text-sm transition flex items-center space-x-1 whitespace-nowrap mb-2 ml-2 shadow-xs">
             <i class="fa-solid fa-folder-plus"></i>
             <span>Nova Aba</span>
         </button>
     </nav>
 
     <!-- Quadro Kanban -->
-    <main class="flex-1 p-3 sm:p-6 overflow-x-auto w-full">
+    <main class="flex-1 p-3 sm:p-6 overflow-x-auto w-full bg-[#09090b]">
         <div id="kanban-board" class="flex gap-4 sm:gap-6 min-w-max pb-4"></div>
     </main>
 
-    <!-- Modais -->
-    <div id="modal-projeto" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-base sm:text-lg font-bold mb-4 text-white flex items-center space-x-2">
-                <i class="fa-solid fa-laptop-code text-indigo-400"></i>
-                <span>Novo Projeto de Software</span>
-            </h3>
+    <!-- Modal: Adicionar Projeto (Estilo Dialog Shadcn) -->
+    <div id="modal-projeto" class="fixed inset-0 bg-black/80 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 z-50 animate-in fade-in duration-200">
+        <div class="bg-[#18181b] border border-[#27272a] rounded-xl max-w-md w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-[#27272a]">
+                <h3 class="text-base font-semibold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-laptop-code text-indigo-400"></i>
+                    <span>Novo Projeto de Software</span>
+                </h3>
+                <button onclick="fecharModalProjeto()" class="text-zinc-400 hover:text-white p-1 text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
             <form id="form-projeto" onsubmit="salvarProjeto(event)" class="space-y-3 sm:space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Nome do Projeto</label>
-                    <input type="text" id="proj-nome" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Ex: API de Pagamentos">
+                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Nome do Projeto</label>
+                    <input type="text" id="proj-nome" required class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="Ex: API de Pagamentos">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Descrição / Tech Stack</label>
-                    <textarea id="proj-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Ex: Node.js, Express, PostgreSQL..."></textarea>
+                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Descrição / Tech Stack</label>
+                    <textarea id="proj-desc" rows="2" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="Ex: Node.js, Express, PostgreSQL..."></textarea>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Link do Projeto / Repo</label>
-                        <input type="url" id="proj-link" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="https://github.com/...">
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-brands fa-github mr-1"></i> Repo / Projeto</label>
+                        <input type="url" id="proj-link" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://github.com/...">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Link da Documentação</label>
-                        <input type="url" id="proj-doc" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="https://notion.so/...">
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-book mr-1"></i> Documentação</label>
+                        <input type="url" id="proj-doc" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://notion.so/...">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-brands fa-figma mr-1 text-pink-400"></i> Figma (Design)</label>
+                        <input type="url" id="proj-figma" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://figma.com/...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-compass-drafting mr-1 text-amber-400"></i> Whimsical (Fluxo)</label>
+                        <input type="url" id="proj-whimsical" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://whimsical.com/...">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Status Inicial</label>
-                    <select id="proj-status" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white"></select>
+                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Status Inicial</label>
+                    <select id="proj-status" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white"></select>
                 </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalProjeto()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm transition">Cancelar</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium">Salvar Projeto</button>
+                <div class="flex justify-end space-x-2 pt-3">
+                    <button type="button" onclick="fecharModalProjeto()" class="bg-[#27272a] hover:bg-[#3f3f46] text-zinc-300 px-4 py-2 rounded-md text-sm transition">Cancelar</button>
+                    <button type="submit" class="bg-white hover:bg-zinc-200 text-zinc-900 px-4 py-2 rounded-md text-sm transition font-medium shadow-sm">Salvar Projeto</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-aba" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-sm w-full p-4 sm:p-6 shadow-2xl">
-            <h3 class="text-base sm:text-lg font-bold mb-4 text-white flex items-center space-x-2">
+    <!-- Modal: Adicionar Aba -->
+    <div id="modal-aba" class="fixed inset-0 bg-black/80 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-[#18181b] border border-[#27272a] rounded-xl max-w-sm w-full p-5 sm:p-6 shadow-2xl">
+            <h3 class="text-base font-semibold mb-4 text-white flex items-center space-x-2">
                 <i class="fa-solid fa-folder-plus text-indigo-400"></i>
                 <span>Nova Aba Personalizada</span>
             </h3>
             <form id="form-aba" onsubmit="salvarAba(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Nome da Aba</label>
-                    <input type="text" id="aba-nome" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Nome da categoria">
+                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Nome da Aba</label>
+                    <input type="text" id="aba-nome" required class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="Ex: Backend, Mobile...">
                 </div>
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="fecharModalAba()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm transition">Cancelar</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium">Criar Aba</button>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="fecharModalAba()" class="bg-[#27272a] hover:bg-[#3f3f46] text-zinc-300 px-4 py-2 rounded-md text-sm transition">Cancelar</button>
+                    <button type="submit" class="bg-white hover:bg-zinc-200 text-zinc-900 px-4 py-2 rounded-md text-sm transition font-medium shadow-sm">Criar Aba</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-config-colunas" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-base sm:text-lg font-bold mb-2 text-white flex items-center space-x-2">
+    <!-- Modal: Configurar Colunas -->
+    <div id="modal-config-colunas" class="fixed inset-0 bg-black/80 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-[#18181b] border border-[#27272a] rounded-xl max-w-lg w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-base font-semibold mb-2 text-white flex items-center space-x-2">
                 <i class="fa-solid fa-columns text-indigo-400"></i>
                 <span>Gerenciar Etapas (Colunas)</span>
             </h3>
+            <p class="text-xs text-zinc-400 mb-4">Reordene, renomeie ou adicione novas colunas ao seu fluxo.</p>
             <div id="lista-config-colunas" class="space-y-2 mb-4 max-h-[250px] overflow-y-auto pr-1"></div>
-            <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
+            <div class="border-t border-[#27272a] pt-3 flex justify-between items-center">
                 <button type="button" onclick="adicionarColunaPrompt()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center space-x-1"><i class="fa-solid fa-plus"></i><span>Adicionar Coluna</span></button>
-                <button type="button" onclick="fecharModalConfigColunas()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium">Concluir</button>
+                <button type="button" onclick="fecharModalConfigColunas()" class="bg-white hover:bg-zinc-200 text-zinc-900 px-4 py-2 rounded-md text-sm transition font-medium shadow-sm">Concluir</button>
             </div>
         </div>
     </div>
 
-    <!-- Script de Integração Nativa via Fetch API -->
+    <!-- Script de Integração -->
     <script>
         const SUPABASE_URL = 'https://dhgllybqgknrsnyxcxdn.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_0GX8SNsEtJzQXzt4YgHqSQ_IeNp40p0';
@@ -155,14 +171,14 @@
                 if (result && result.length > 0 && result[0].content) {
                     dadosApp = result[0].content;
                     statusEl.textContent = '● Sincronizado na nuvem';
-                    statusEl.className = 'text-[10px] text-emerald-400';
+                    statusEl.className = 'text-[10px] text-emerald-400 font-medium';
                 } else {
                     await salvarDadosNoSupabase();
                 }
             } catch (err) {
                 console.error('Erro ao carregar:', err);
                 statusEl.textContent = '● Erro de conexão';
-                statusEl.className = 'text-[10px] text-rose-400';
+                statusEl.className = 'text-[10px] text-rose-400 font-medium';
             }
             renderizar();
         }
@@ -171,7 +187,7 @@
             renderizar();
             const statusEl = document.getElementById('sync-status');
             statusEl.textContent = '● Salvando...';
-            statusEl.className = 'text-[10px] text-amber-400';
+            statusEl.className = 'text-[10px] text-amber-400 font-medium';
 
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/kanban_data`, {
@@ -187,11 +203,11 @@
 
                 if (!response.ok) throw new Error('Erro ao salvar');
                 statusEl.textContent = '● Sincronizado na nuvem';
-                statusEl.className = 'text-[10px] text-emerald-400';
+                statusEl.className = 'text-[10px] text-emerald-400 font-medium';
             } catch (err) {
                 console.error('Erro ao salvar:', err);
                 statusEl.textContent = '● Erro ao salvar';
-                statusEl.className = 'text-[10px] text-rose-400';
+                statusEl.className = 'text-[10px] text-rose-400 font-medium';
             }
         }
 
@@ -220,7 +236,7 @@
             dadosApp.abas.forEach(aba => {
                 const ativa = aba.id === dadosApp.abaAtiva;
                 const btn = document.createElement('button');
-                btn.className = `px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-t-lg transition flex items-center space-x-2 border-b-2 whitespace-nowrap ${ativa ? 'bg-slate-800 text-indigo-400 border-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-800/40'}`;
+                btn.className = `px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-t-lg transition flex items-center space-x-2 border-b-2 whitespace-nowrap ${ativa ? 'bg-[#18181b] text-white border-white shadow-xs' : 'text-zinc-400 hover:text-zinc-200 border-transparent hover:bg-[#18181b]/50'}`;
                 btn.innerHTML = `<span>${aba.nome}</span>${dadosApp.abas.length > 1 ? `<i class="fa-solid fa-xmark ml-2 text-xs hover:text-red-400" onclick="event.stopPropagation(); deletarAba('${aba.id}')"></i>` : ''}`;
                 btn.onclick = () => { dadosApp.abaAtiva = aba.id; salvarDados(); };
                 container.appendChild(btn);
@@ -237,14 +253,14 @@
 
             dadosApp.colunas.forEach(col => {
                 const colDiv = document.createElement('div');
-                colDiv.className = 'bg-slate-800/80 border border-slate-700/60 rounded-xl p-3 sm:p-4 flex flex-col shadow-xl w-[280px] sm:w-[320px] shrink-0';
+                colDiv.className = 'bg-[#121214] border border-[#27272a] rounded-xl p-3 sm:p-4 flex flex-col shadow-lg w-[290px] sm:w-[320px] shrink-0';
                 colDiv.innerHTML = `
-                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-700">
-                        <h2 class="font-semibold text-slate-300 text-xs sm:text-sm flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${col.cor} inline-block"></span>
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-[#27272a]">
+                        <h2 class="font-semibold text-zinc-200 text-xs sm:text-sm flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full ${col.cor} inline-block"></span>
                             <span class="truncate max-w-[170px]">${col.nome}</span>
                         </h2>
-                        <span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full font-bold">${counts[col.id] || 0}</span>
+                        <span class="bg-[#27272a] text-zinc-300 text-xs px-2 py-0.5 rounded-full font-bold">${counts[col.id] || 0}</span>
                     </div>
                     <div id="coluna-${col.id}" class="flex-1 space-y-3 overflow-y-auto min-h-[350px] max-h-[65vh]" ondragover="permitirDrop(event)" ondrop="dropar(event, '${col.id}')"></div>
                 `;
@@ -253,18 +269,20 @@
                 const containerCards = colDiv.querySelector(`#coluna-${col.id}`);
                 projetosFiltrados.filter(p => p.status === col.id).forEach(proj => {
                     const card = document.createElement('div');
-                    card.className = 'bg-slate-900/90 border border-slate-700/80 rounded-lg p-3 sm:p-4 shadow-md hover:border-slate-500 transition cursor-grab active:cursor-grabbing group relative';
+                    card.className = 'bg-[#18181b] border border-[#27272a] rounded-lg p-3 sm:p-4 shadow-sm hover:border-[#3f3f46] transition cursor-grab active:cursor-grabbing group relative';
                     card.draggable = true;
                     card.ondragstart = (e) => e.dataTransfer.setData('text/plain', proj.id);
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-slate-100 text-xs sm:text-sm tracking-wide pr-6">${proj.nome}</h4>
-                            <button onclick="deletarProjeto('${proj.id}')" class="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition absolute right-2 top-2 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            <h4 class="font-semibold text-zinc-100 text-xs sm:text-sm tracking-wide pr-6">${proj.nome}</h4>
+                            <button onclick="deletarProjeto('${proj.id}')" class="text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition absolute right-2 top-2 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
                         </div>
-                        <p class="text-xs text-slate-400 mb-3 line-clamp-2">${proj.desc || 'Sem descrição.'}</p>
-                        <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800 text-xs">
-                            ${proj.link ? `<a href="${proj.link}" target="_blank" class="bg-indigo-950/60 text-indigo-400 hover:bg-indigo-900/60 px-2 py-1 rounded border border-indigo-800/50 flex items-center space-x-1"><i class="fa-solid fa-code-branch"></i><span>Repo</span></a>` : ''}
-                            ${proj.doc ? `<a href="${proj.doc}" target="_blank" class="bg-blue-950/60 text-blue-400 hover:bg-blue-900/60 px-2 py-1 rounded border border-blue-800/50 flex items-center space-x-1"><i class="fa-solid fa-book"></i><span>Docs</span></a>` : ''}
+                        <p class="text-xs text-zinc-400 mb-3 line-clamp-2">${proj.desc || 'Sem descrição.'}</p>
+                        <div class="flex flex-wrap gap-1.5 pt-2 border-t border-[#27272a] text-[11px]">
+                            ${proj.link ? `<a href="${proj.link}" target="_blank" class="bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 px-2 py-0.5 rounded border border-[#3f3f46]/50 flex items-center space-x-1"><i class="fa-brands fa-github"></i><span>Repo</span></a>` : ''}
+                            ${proj.doc ? `<a href="${proj.doc}" target="_blank" class="bg-blue-950/40 text-blue-300 hover:bg-blue-900/50 px-2 py-0.5 rounded border border-blue-800/30 flex items-center space-x-1"><i class="fa-solid fa-book"></i><span>Docs</span></a>` : ''}
+                            ${proj.figma ? `<a href="${proj.figma}" target="_blank" class="bg-pink-950/40 text-pink-300 hover:bg-pink-900/50 px-2 py-0.5 rounded border border-pink-800/30 flex items-center space-x-1"><i class="fa-brands fa-figma"></i><span>Figma</span></a>` : ''}
+                            ${proj.whimsical ? `<a href="${proj.whimsical}" target="_blank" class="bg-amber-950/40 text-amber-300 hover:bg-amber-900/50 px-2 py-0.5 rounded border border-amber-800/30 flex items-center space-x-1"><i class="fa-solid fa-compass-drafting"></i><span>Whimsical</span></a>` : ''}
                         </div>
                     `;
                     containerCards.appendChild(card);
@@ -302,22 +320,22 @@
             container.innerHTML = '';
             dadosApp.colunas.forEach((col, index) => {
                 const item = document.createElement('div');
-                item.className = 'bg-slate-900 border border-slate-700/80 rounded-lg p-2.5 sm:p-3 flex items-center justify-between gap-2';
+                item.className = 'bg-[#09090b] border border-[#27272a] rounded-lg p-2.5 sm:p-3 flex items-center justify-between gap-2';
                 item.innerHTML = `
                     <div class="flex items-center space-x-2 flex-1 min-w-0">
-                        <select onchange="mudarCorColuna('${col.id}', this.value)" class="bg-slate-800 border border-slate-700 rounded px-1 py-1 text-xs text-white shrink-0">
+                        <select onchange="mudarCorColuna('${col.id}', this.value)" class="bg-[#18181b] border border-[#27272a] rounded px-1 py-1 text-xs text-white shrink-0">
                             <option value="bg-amber-500" ${col.cor === 'bg-amber-500' ? 'selected' : ''}>🟡</option>
                             <option value="bg-blue-500" ${col.cor === 'bg-blue-500' ? 'selected' : ''}>🔵</option>
                             <option value="bg-indigo-500" ${col.cor === 'bg-indigo-500' ? 'selected' : ''}>🟣</option>
                             <option value="bg-purple-500" ${col.cor === 'bg-purple-500' ? 'selected' : ''}>💜</option>
                             <option value="bg-emerald-500" ${col.cor === 'bg-emerald-500' ? 'selected' : ''}>🟢</option>
                         </select>
-                        <input type="text" value="${col.nome}" onchange="renomearColuna('${col.id}', this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white flex-1 focus:outline-none focus:border-indigo-500 min-w-0">
+                        <input type="text" value="${col.nome}" onchange="renomearColuna('${col.id}', this.value)" class="bg-[#18181b] border border-[#27272a] rounded px-2 py-1 text-xs text-white flex-1 focus:outline-none focus:ring-1 focus:ring-zinc-400 min-w-0">
                     </div>
                     <div class="flex items-center space-x-1 shrink-0">
-                        <button onclick="moverColuna(${index}, -1)" ${index === 0 ? 'disabled class="text-slate-600 cursor-not-allowed px-1.5 py-1 text-xs"' : 'class="text-slate-300 hover:text-white px-1.5 py-1 text-xs bg-slate-800 rounded"'}>⬆</button>
-                        <button onclick="moverColuna(${index}, 1)" ${index === dadosApp.colunas.length - 1 ? 'disabled class="text-slate-600 cursor-not-allowed px-1.5 py-1 text-xs"' : 'class="text-slate-300 hover:text-white px-1.5 py-1 text-xs bg-slate-800 rounded"'}>⬇</button>
-                        <button onclick="deletarColuna('${col.id}')" class="text-red-400 hover:text-red-300 px-1.5 py-1 text-xs bg-slate-800 rounded">🗑</button>
+                        <button onclick="moverColuna(${index}, -1)" ${index === 0 ? 'disabled class="text-zinc-600 cursor-not-allowed px-1.5 py-1 text-xs"' : 'class="text-zinc-300 hover:text-white px-1.5 py-1 text-xs bg-[#18181b] rounded"'}>⬆</button>
+                        <button onclick="moverColuna(${index}, 1)" ${index === dadosApp.colunas.length - 1 ? 'disabled class="text-zinc-600 cursor-not-allowed px-1.5 py-1 text-xs"' : 'class="text-zinc-300 hover:text-white px-1.5 py-1 text-xs bg-[#18181b] rounded"'}>⬇</button>
+                        <button onclick="deletarColuna('${col.id}')" class="text-red-400 hover:text-red-300 px-1.5 py-1 text-xs bg-[#18181b] rounded">🗑</button>
                     </div>
                 `;
                 container.appendChild(item);
@@ -358,6 +376,8 @@
                 desc: document.getElementById('proj-desc').value,
                 link: document.getElementById('proj-link').value,
                 doc: document.getElementById('proj-doc').value,
+                figma: document.getElementById('proj-figma').value,
+                whimsical: document.getElementById('proj-whimsical').value,
                 status: document.getElementById('proj-status').value
             });
             salvarDados();
@@ -383,7 +403,6 @@
             salvarDados();
         }
 
-        // Inicializar app carregando do Supabase
         carregarDadosDoSupabase();
     </script>
 </body>
