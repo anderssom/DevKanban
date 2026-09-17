@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevKanban - Cloud (Supabase)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Cabeçalho -->
+    <header class="bg-slate-800 border-b border-slate-700 p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                <i class="fa-solid fa-code text-lg sm:text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg sm:text-xl font-bold tracking-wide">Dev<span class="text-indigo-400">Kanban</span></h1>
+                <p id="sync-status" class="text-[10px] text-amber-400">Conectando ao Supabase...</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <button onclick="abrirModalConfigColunas()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-columns"></i>
+                <span class="hidden xs:inline">Colunas</span>
+            </button>
+            <button onclick="abrirModalProjeto()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/30">
+                <i class="fa-solid fa-plus"></i>
+                <span>Novo Projeto</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Navegação por Abas -->
+    <nav class="bg-slate-800/50 border-b border-slate-700 px-3 sm:px-4 pt-3 flex justify-between items-center overflow-x-auto">
+        <div id="container-abas" class="flex space-x-2 pb-2"></div>
+        <button onclick="abrirModalAba()" class="text-slate-400 hover:text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1 whitespace-nowrap mb-2 ml-2">
+            <i class="fa-solid fa-folder-plus"></i>
+            <span>Nova Aba</span>
+        </button>
+    </nav>
+
+    <!-- Quadro Kanban -->
+    <main class="flex-1 p-3 sm:p-6 overflow-x-auto w-full">
+        <div id="kanban-board" class="flex gap-4 sm:gap-6 min-w-max pb-4"></div>
+    </main>
+
+    <!-- Modais (Projeto, Aba, Configurações) mantidos iguais -->
+    <div id="modal-projeto" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-base sm:text-lg font-bold mb-4 text-white flex items-center space-x-2">
+                <i class="fa-solid fa-laptop-code text-indigo-400"></i>
+                <span>Novo Projeto de Software</span>
+            </h3>
+            <form id="form-projeto" onsubmit="salvarProjeto(event)" class="space-y-3 sm:space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Nome do Projeto</label>
+                    <input type="text" id="proj-nome" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Ex: API de Pagamentos">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Descrição / Tech Stack</label>
+                    <textarea id="proj-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Ex: Node.js, Express, PostgreSQL..."></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Link do Projeto / Repo</label>
+                        <input type="url" id="proj-link" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="https://github.com/...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Link da Documentação</label>
+                        <input type="url" id="proj-doc" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="https://notion.so/...">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Status Inicial</label>
+                    <select id="proj-status" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white"></select>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="fecharModalProjeto()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm transition">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium">Salvar Projeto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-aba" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-sm w-full p-4 sm:p-6 shadow-2xl">
+            <h3 class="text-base sm:text-lg font-bold mb-4 text-white flex items-center space-x-2">
+                <i class="fa-solid fa-folder-plus text-indigo-400"></i>
+                <span>Nova Aba Personalizada</span>
+            </h3>
+            <form id="form-aba" onsubmit="salvarAba(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Nome da Aba</label>
+                    <input type="text" id="aba-nome" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Nome da categoria">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="fecharModalAba()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm transition">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium">Criar Aba</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-config-colunas" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-base sm:text-lg font-bold mb-2 text-white flex items-center space-x-2">
+                <i class="fa-solid fa-columns text-indigo-400"></i>
+                <span>Gerenciar Etapas (Colunas)</span>
+            </h3>
+            <div id="lista-config-colunas" class="space-y-2 mb-4 max-h-[250px] overflow-y-auto pr-1"></div>
+            <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
+                <button type="button" onclick="adicionarColunaPrompt()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center space-x-1"><i class="fa-solid fa-plus"></i><span>Adicionar Coluna</span></button>
+                <button type="button" onclick="fecharModalConfigColunas()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm transition font-medium">Concluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Integração com Supabase -->
+    <script>
+        // ⚠️ INSIRA SUAS CREDENCIAIS DO SUPABASE AQUI ⚠️
+        const SUPABASE_URL = 'https://dhgllybqgknrsnyxcxdn.supabase.co';
+        const SUPABASE_ANON_KEY = 'Rg7DgtvLOD2Hz5Ui';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let dadosApp = {
+            colunas: [
+                { id: 'todo', nome: 'A Fazer', cor: 'bg-amber-500' },
+                { id: 'config', nome: 'Configurando', cor: 'bg-blue-500' },
+                { id: 'inprogress', nome: 'Em Andamento', cor: 'bg-indigo-500' },
+                { id: 'testing', nome: 'Testando', cor: 'bg-purple-500' },
+                { id: 'done', nome: 'Pronto', cor: 'bg-emerald-500' }
+            ],
+            abas: [
+                { id: 'geral', nome: 'Geral / Fullstack' }
+            ],
+            abaAtiva: 'geral',
+            projetos: []
+        };
+
+        // Carregar dados do Supabase ao iniciar
+        async function carregarDadosDoSupabase() {
+            const statusEl = document.getElementById('sync-status');
+            try {
+                const { data, error } = await _supabase
+                    .from('kanban_data')
+                    .select('content')
+                    .eq('id', 'main_board')
+                    .single();
+
+                if (data && data.content) {
+                    dadosApp = data.content;
+                    statusEl.textContent = '● Sincronizado na nuvem';
+                    statusEl.className = 'text-[10px] text-emerald-400';
+                } else {
+                    // Se não existir, cria o registro inicial
+                    await salvarDadosNoSupabase();
+                }
+            } catch (err) {
+                console.error('Erro ao carregar:', err);
+                statusEl.textContent = '● Erro de conexão';
+                statusEl.className = 'text-[10px] text-rose-400';
+            }
+            renderizar();
+        }
+
+        // Salvar dados automaticamente no Supabase
+        async function salvarDados() {
+            renderizar();
+            const statusEl = document.getElementById('sync-status');
+            statusEl.textContent = '● Salvando...';
+            statusEl.className = 'text-[10px] text-amber-400';
+
+            try {
+                const { error } = await _supabase
+                    .from('kanban_data')
+                    .upsert({ id: 'main_board', content: dadosApp, updated_at: new Date() });
+
+                if (error) throw error;
+                statusEl.textContent = '● Sincronizado na nuvem';
+                statusEl.className = 'text-[10px] text-emerald-400';
+            } catch (err) {
+                console.error('Erro ao salvar:', err);
+                statusEl.textContent = '● Erro ao salvar';
+                statusEl.className = 'text-[10px] text-rose-400';
+            }
+        }
+
+        async function salvarDadosNoSupabase() {
+            await _supabase.from('kanban_data').upsert({ id: 'main_board', content: dadosApp });
+        }
+
+        function renderizar() {
+            renderizarAbas();
+            renderizarQuadroKanban();
+            atualizarSelectModalProjeto();
+        }
+
+        function renderizarAbas() {
+            const container = document.getElementById('container-abas');
+            container.innerHTML = '';
+            dadosApp.abas.forEach(aba => {
+                const ativa = aba.id === dadosApp.abaAtiva;
+                const btn = document.createElement('button');
+                btn.className = `px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-t-lg transition flex items-center space-x-2 border-b-2 whitespace-nowrap ${ativa ? 'bg-slate-800 text-indigo-400 border-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-800/40'}`;
+                btn.innerHTML = `<span>${aba.nome}</span>${dadosApp.abas.length > 1 ? `<i class="fa-solid fa-xmark ml-2 text-xs hover:text-red-400" onclick="event.stopPropagation(); deletarAba('${aba.id}')"></i>` : ''}`;
+                btn.onclick = () => { dadosApp.abaAtiva = aba.id; salvarDados(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderizarQuadroKanban() {
+            const board = document.getElementById('kanban-board');
+            board.innerHTML = '';
+            let counts = {};
+            dadosApp.colunas.forEach(col => counts[col.id] = 0);
+            const projetosFiltrados = dadosApp.projetos.filter(p => p.abaId === dadosApp.abaAtiva);
+            projetosFiltrados.forEach(proj => { if (counts[proj.status] !== undefined) counts[proj.status]++; });
+
+            dadosApp.colunas.forEach(col => {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'bg-slate-800/80 border border-slate-700/60 rounded-xl p-3 sm:p-4 flex flex-col shadow-xl w-[280px] sm:w-[320px] shrink-0';
+                colDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-700">
+                        <h2 class="font-semibold text-slate-300 text-xs sm:text-sm flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${col.cor} inline-block"></span>
+                            <span class="truncate max-w-[170px]">${col.nome}</span>
+                        </h2>
+                        <span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full font-bold">${counts[col.id] || 0}</span>
+                    </div>
+                    <div id="coluna-${col.id}" class="flex-1 space-y-3 overflow-y-auto min-h-[350px] max-h-[65vh]" ondragover="permitirDrop(event)" ondrop="dropar(event, '${col.id}')"></div>
+                `;
+                board.appendChild(colDiv);
+
+                const containerCards = colDiv.querySelector(`#coluna-${col.id}`);
+                projetosFiltrados.filter(p => p.status === col.id).forEach(proj => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900/90 border border-slate-700/80 rounded-lg p-3 sm:p-4 shadow-md hover:border-slate-500 transition cursor-grab active:cursor-grabbing group relative';
+                    card.draggable = true;
+                    card.ondragstart = (e) => e.dataTransfer.setData('text/plain', proj.id);
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-100 text-xs sm:text-sm tracking-wide pr-6">${proj.nome}</h4>
+                            <button onclick="deletarProjeto('${proj.id}')" class="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition absolute right-2 top-2 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3 line-clamp-2">${proj.desc || 'Sem descrição.'}</p>
+                        <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800 text-xs">
+                            ${proj.link ? `<a href="${proj.link}" target="_blank" class="bg-indigo-950/60 text-indigo-400 hover:bg-indigo-900/60 px-2 py-1 rounded border border-indigo-800/50 flex items-center space-x-1"><i class="fa-solid fa-code-branch"></i><span>Repo</span></a>` : ''}
+                            ${proj.doc ? `<a href="${proj.doc}" target="_blank" class="bg-blue-950/60 text-blue-400 hover:bg-blue-900/60 px-2 py-1 rounded border border-blue-800/50 flex items-center space-x-1"><i class="fa-solid fa-book"></i><span>Docs</span></a>` : ''}
+                        </div>
+                    `;
+                    containerCards.appendChild(card);
+                });
+            });
+        }
+
+        function atualizarSelectModalProjeto() {
+            const select = document.getElementById('proj-status');
+            select.innerHTML = '';
+            dadosApp.colunas.forEach(col => {
+                const opt = document.createElement('option');
+                opt.value = col.id; opt.textContent = col.nome;
+                select.appendChild(opt);
+            });
+        }
+
+        function permitirDrop(e) { e.preventDefault(); }
+        function dropar(e, novoStatus) {
+            e.preventDefault();
+            const projId = e.dataTransfer.getData('text/plain');
+            const projeto = dadosApp.projetos.find(p => p.id === projId);
+            if (projeto) { projeto.status = novoStatus; salvarDados(); }
+        }
+
+        function abrirModalProjeto() { document.getElementById('modal-projeto').classList.remove('hidden'); document.getElementById('modal-projeto').classList.add('flex'); }
+        function fecharModalProjeto() { document.getElementById('modal-projeto').classList.remove('flex'); document.getElementById('modal-projeto').classList.add('hidden'); document.getElementById('form-projeto').reset(); }
+        function abrirModalAba() { document.getElementById('modal-aba').classList.remove('hidden'); document.getElementById('modal-aba').classList.add('flex'); }
+        function fecharModalAba() { document.getElementById('modal-aba').classList.remove('flex'); document.getElementById('modal-aba').classList.add('hidden'); document.getElementById('form-aba').reset(); }
+        function abrirModalConfigColunas() { renderizarListaConfigColunas(); document.getElementById('modal-config-colunas').classList.remove('hidden'); document.getElementById('modal-config-colunas').classList.add('flex'); }
+        function fecharModalConfigColunas() { document.getElementById('modal-config-colunas').classList.remove('flex'); document.getElementById('modal-config-colunas').classList.add('hidden'); salvarDados(); }
+
+        function renderizarListaConfigColunas() {
+            const container = document.getElementById('lista-config-colunas');
+            container.innerHTML = '';
+            dadosApp.colunas.forEach((col, index) => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-900 border border-slate-700/80 rounded-lg p-2.5 sm:p-3 flex items-center justify-between gap-2';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2 flex-1 min-w-0">
+                        <select onchange="mudarCorColuna('${col.id}', this.value)" class="bg-slate-800 border border-slate-700 rounded px-1 py-1 text-xs text-white shrink-0">
+                            <option value="bg-amber-500" ${col.cor === 'bg-amber-500' ? 'selected' : ''}>🟡</option>
+                            <option value="bg-blue-500" ${col.cor === 'bg-blue-500' ? 'selected' : ''}>🔵</option>
+                            <option value="bg-indigo-500" ${col.cor === 'bg-indigo-500' ? 'selected' : ''}>🟣</option>
+                            <option value="bg-purple-500" ${col.cor === 'bg-purple-500' ? 'selected' : ''}>💜</option>
+                            <option value="bg-emerald-500" ${col.cor === 'bg-emerald-500' ? 'selected' : ''}>🟢</option>
+                        </select>
+                        <input type="text" value="${col.nome}" onchange="renomearColuna('${col.id}', this.value)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white flex-1 focus:outline-none focus:border-indigo-500 min-w-0">
+                    </div>
+                    <div class="flex items-center space-x-1 shrink-0">
+                        <button onclick="moverColuna(${index}, -1)" ${index === 0 ? 'disabled class="text-slate-600 cursor-not-allowed px-1.5 py-1 text-xs"' : 'class="text-slate-300 hover:text-white px-1.5 py-1 text-xs bg-slate-800 rounded"'}>⬆</button>
+                        <button onclick="moverColuna(${index}, 1)" ${index === dadosApp.colunas.length - 1 ? 'disabled class="text-slate-600 cursor-not-allowed px-1.5 py-1 text-xs"' : 'class="text-slate-300 hover:text-white px-1.5 py-1 text-xs bg-slate-800 rounded"'}>⬇</button>
+                        <button onclick="deletarColuna('${col.id}')" class="text-red-400 hover:text-red-300 px-1.5 py-1 text-xs bg-slate-800 rounded">🗑</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function moverColuna(index, direcao) {
+            const novoIndex = index + direcao;
+            if (novoIndex < 0 || novoIndex >= dadosApp.colunas.length) return;
+            const temp = dadosApp.colunas[index];
+            dadosApp.colunas[index] = dadosApp.colunas[novoIndex];
+            dadosApp.colunas[novoIndex] = temp;
+            renderizarListaConfigColunas();
+        }
+
+        function renomearColuna(id, novoNome) { const col = dadosApp.colunas.find(c => c.id === id); if (col) col.nome = novoNome; }
+        function mudarCorColuna(id, novaCor) { const col = dadosApp.colunas.find(c => c.id === id); if (col) col.cor = novaCor; }
+        function adicionarColunaPrompt() {
+            const nome = prompt("Nome da nova coluna:");
+            if (!nome) return;
+            dadosApp.colunas.push({ id: 'col_' + Date.now(), nome, cor: 'bg-indigo-500' });
+            renderizarListaConfigColunas();
+        }
+        function deletarColuna(id) {
+            if (dadosApp.colunas.length <= 1) return alert('Mantenha ao menos uma coluna.');
+            const primeiraRestante = dadosApp.colunas.find(c => c.id !== id).id;
+            dadosApp.projetos.forEach(p => { if (p.status === id) p.status = primeiraRestante; });
+            dadosApp.colunas = dadosApp.colunas.filter(c => c.id !== id);
+            renderizarListaConfigColunas();
+        }
+
+        function salvarProjeto(e) {
+            e.preventDefault();
+            dadosApp.projetos.push({
+                id: Date.now().toString(),
+                abaId: dadosApp.abaAtiva,
+                nome: document.getElementById('proj-nome').value,
+                desc: document.getElementById('proj-desc').value,
+                link: document.getElementById('proj-link').value,
+                doc: document.getElementById('proj-doc').value,
+                status: document.getElementById('proj-status').value
+            });
+            salvarDados();
+            fecharModalProjeto();
+        }
+
+        function salvarAba(e) {
+            e.preventDefault();
+            const nomeAba = document.getElementById('aba-nome').value;
+            const novaId = 'aba_' + Date.now();
+            dadosApp.abas.push({ id: novaId, nome: nomeAba });
+            dadosApp.abaAtiva = novaId;
+            salvarDados();
+            fecharModalAba();
+        }
+
+        function deletarProjeto(id) { dadosApp.projetos = dadosApp.projetos.filter(p => p.id !== id); salvarDados(); }
+        function deletarAba(id) {
+            if (dadosApp.abas.length <= 1) return alert('Você precisa ter pelo menos uma aba.');
+            dadosApp.projetos = dadosApp.projetos.filter(p => p.abaId !== id);
+            dadosApp.abas = dadosApp.abas.filter(a => a.id !== id);
+            dadosApp.abaAtiva = dadosApp.abas[0].id;
+            salvarDados();
+        }
+
+        // Inicializar app carregando do Supabase
+        carregarDadosDoSupabase();
+    </script>
+</body>
+</html>
