@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +33,7 @@
             </div>
             <div>
                 <h1 class="text-base sm:text-lg font-semibold tracking-tight text-white">Dev<span class="text-indigo-400">Kanban</span></h1>
-                <p id="sync-status" class="text-[10px] text-amber-400 font-medium">Conectando ao Supabase...</p>
+                <p id="sync-status" class="text-[10px] text-amber-400 font-medium">A ligar ao Supabase...</p>
             </div>
         </div>
         <div class="flex items-center space-x-2 sm:space-x-2.5">
@@ -88,22 +88,26 @@
                         <input type="url" id="proj-link" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://github.com/...">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-book mr-1"></i> Documentação</label>
-                        <input type="url" id="proj-doc" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://notion.so/...">
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-globe mr-1 text-emerald-400"></i> Link Online</label>
+                        <input type="url" id="proj-online" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://meuapp.com">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-book mr-1"></i> Documentação</label>
+                        <input type="url" id="proj-doc" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://notion.so/...">
+                    </div>
+                    <div>
                         <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-brands fa-figma mr-1 text-pink-400"></i> Figma (Design)</label>
                         <input type="url" id="proj-figma" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://figma.com/...">
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-compass-drafting mr-1 text-amber-400"></i> Whimsical (Fluxo)</label>
-                        <input type="url" id="proj-whimsical" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://whimsical.com/...">
-                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Status Inicial</label>
+                    <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-compass-drafting mr-1 text-amber-400"></i> Whimsical (Fluxo)</label>
+                    <input type="url" id="proj-whimsical" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://whimsical.com/...">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-zinc-300 mb-1.5">Estado Inicial</label>
                     <select id="proj-status" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white"></select>
                 </div>
                 <div class="flex justify-end space-x-2 pt-3">
@@ -139,7 +143,7 @@
         <div class="bg-[#18181b] border border-[#27272a] rounded-xl max-w-lg w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-base font-semibold mb-2 text-white flex items-center space-x-2">
                 <i class="fa-solid fa-columns text-indigo-400"></i>
-                <span>Gerenciar Etapas (Colunas)</span>
+                <span>Gerir Etapas (Colunas)</span>
             </h3>
             <p class="text-xs text-zinc-400 mb-4">Reordene, renomeie ou adicione novas colunas ao seu fluxo.</p>
             <div id="lista-config-colunas" class="space-y-2 mb-4 max-h-[250px] overflow-y-auto pr-1"></div>
@@ -192,7 +196,7 @@
                 }
             } catch (err) {
                 console.error('Erro ao carregar:', err);
-                statusEl.textContent = '● Erro de conexão';
+                statusEl.textContent = '● Erro de ligação';
                 statusEl.className = 'text-[10px] text-rose-400 font-medium';
             }
             renderizar();
@@ -201,7 +205,7 @@
         async function salvarDados() {
             renderizar();
             const statusEl = document.getElementById('sync-status');
-            statusEl.textContent = '● Salvando...';
+            statusEl.textContent = '● A guardar...';
             statusEl.className = 'text-[10px] text-amber-400 font-medium';
 
             try {
@@ -216,12 +220,12 @@
                     body: JSON.stringify({ id: 'main_board', content: dadosApp, updated_at: new Date() })
                 });
 
-                if (!response.ok) throw new Error('Erro ao salvar');
+                if (!response.ok) throw new Error('Erro ao guardar');
                 statusEl.textContent = '● Sincronizado na nuvem';
                 statusEl.className = 'text-[10px] text-emerald-400 font-medium';
             } catch (err) {
-                console.error('Erro ao salvar:', err);
-                statusEl.textContent = '● Erro ao salvar';
+                console.error('Erro ao guardar:', err);
+                statusEl.textContent = '● Erro ao guardar';
                 statusEl.className = 'text-[10px] text-rose-400 font-medium';
             }
         }
@@ -299,6 +303,7 @@
                         <div class="flex flex-wrap gap-1.5 pt-2 border-t border-[#27272a] text-[11px] items-center justify-between">
                             <div class="flex flex-wrap gap-1.5">
                                 ${proj.link ? `<a href="${proj.link}" target="_blank" class="bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 px-2 py-0.5 rounded border border-[#3f3f46]/50 flex items-center space-x-1"><i class="fa-brands fa-github"></i><span>Repo</span></a>` : ''}
+                                ${proj.online ? `<a href="${proj.online}" target="_blank" class="bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50 px-2 py-0.5 rounded border border-emerald-800/30 flex items-center space-x-1"><i class="fa-solid fa-globe"></i><span>Online</span></a>` : ''}
                                 ${proj.doc ? `<a href="${proj.doc}" target="_blank" class="bg-blue-950/40 text-blue-300 hover:bg-blue-900/50 px-2 py-0.5 rounded border border-blue-800/30 flex items-center space-x-1"><i class="fa-solid fa-book"></i><span>Docs</span></a>` : ''}
                                 ${proj.figma ? `<a href="${proj.figma}" target="_blank" class="bg-pink-950/40 text-pink-300 hover:bg-pink-900/50 px-2 py-0.5 rounded border border-pink-800/30 flex items-center space-x-1"><i class="fa-brands fa-figma"></i><span>Figma</span></a>` : ''}
                                 ${proj.whimsical ? `<a href="${proj.whimsical}" target="_blank" class="bg-amber-950/40 text-amber-300 hover:bg-amber-900/50 px-2 py-0.5 rounded border border-amber-800/30 flex items-center space-x-1"><i class="fa-solid fa-compass-drafting"></i><span>Whimsical</span></a>` : ''}
@@ -344,6 +349,7 @@
             document.getElementById('proj-nome').value = proj.nome || '';
             document.getElementById('proj-desc').value = proj.desc || '';
             document.getElementById('proj-link').value = proj.link || '';
+            document.getElementById('proj-online').value = proj.online || '';
             document.getElementById('proj-doc').value = proj.doc || '';
             document.getElementById('proj-figma').value = proj.figma || '';
             document.getElementById('proj-whimsical').value = proj.whimsical || '';
@@ -424,6 +430,7 @@
             const nome = document.getElementById('proj-nome').value;
             const desc = document.getElementById('proj-desc').value;
             const link = document.getElementById('proj-link').value;
+            const online = document.getElementById('proj-online').value;
             const doc = document.getElementById('proj-doc').value;
             const figma = document.getElementById('proj-figma').value;
             const whimsical = document.getElementById('proj-whimsical').value;
@@ -435,6 +442,7 @@
                     proj.nome = nome;
                     proj.desc = desc;
                     proj.link = link;
+                    proj.online = online;
                     proj.doc = doc;
                     proj.figma = figma;
                     proj.whimsical = whimsical;
@@ -442,13 +450,14 @@
                 }
             } else {
                 const hoje = new Date();
-                const dataFormatada = hoje.toLocaleDateString('pt-BR');
+                const dataFormatada = hoje.toLocaleDateString('pt-PT');
                 dadosApp.projetos.push({
                     id: Date.now().toString(),
                     abaId: dadosApp.abaAtiva,
                     nome,
                     desc,
                     link,
+                    online,
                     doc,
                     figma,
                     whimsical,
@@ -479,7 +488,7 @@
         }
 
         function deletarAba(id) {
-            if (dadosApp.abas.length <= 1) return alert('Você precisa ter pelo menos uma aba.');
+            if (dadosApp.abas.length <= 1) return alert('Tem de ter pelo menos uma aba.');
             if (confirm('Deseja excluir esta aba e todos os seus projetos?')) {
                 dadosApp.projetos = dadosApp.projetos.filter(p => p.abaId !== id);
                 dadosApp.abas = dadosApp.abas.filter(a => a.id !== id);
