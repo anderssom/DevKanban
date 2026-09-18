@@ -102,9 +102,15 @@
                         <input type="url" id="proj-figma" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://figma.com/...">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-compass-drafting mr-1 text-amber-400"></i> Whimsical (Fluxo)</label>
-                    <input type="url" id="proj-whimsical" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://whimsical.com/...">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-compass-drafting mr-1 text-amber-400"></i> Whimsical (Fluxo)</label>
+                        <input type="url" id="proj-whimsical" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://whimsical.com/...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-purple-400"></i> Link da IA</label>
+                        <input type="url" id="proj-ia" class="w-full bg-[#09090b] border border-[#27272a] rounded-md p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400 text-white placeholder-zinc-600" placeholder="https://chatgpt.com/c/...">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-zinc-300 mb-1.5">Estado Inicial</label>
@@ -304,6 +310,7 @@
                             <div class="flex flex-wrap gap-1.5">
                                 ${proj.link ? `<a href="${proj.link}" target="_blank" class="bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 px-2 py-0.5 rounded border border-[#3f3f46]/50 flex items-center space-x-1"><i class="fa-brands fa-github"></i><span>Repo</span></a>` : ''}
                                 ${proj.online ? `<a href="${proj.online}" target="_blank" class="bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50 px-2 py-0.5 rounded border border-emerald-800/30 flex items-center space-x-1"><i class="fa-solid fa-globe"></i><span>Online</span></a>` : ''}
+                                ${proj.ia ? `<a href="${proj.ia}" target="_blank" class="bg-purple-950/40 text-purple-300 hover:bg-purple-900/50 px-2 py-0.5 rounded border border-purple-800/30 flex items-center space-x-1"><i class="fa-solid fa-wand-magic-sparkles"></i><span>IA</span></a>` : ''}
                                 ${proj.doc ? `<a href="${proj.doc}" target="_blank" class="bg-blue-950/40 text-blue-300 hover:bg-blue-900/50 px-2 py-0.5 rounded border border-blue-800/30 flex items-center space-x-1"><i class="fa-solid fa-book"></i><span>Docs</span></a>` : ''}
                                 ${proj.figma ? `<a href="${proj.figma}" target="_blank" class="bg-pink-950/40 text-pink-300 hover:bg-pink-900/50 px-2 py-0.5 rounded border border-pink-800/30 flex items-center space-x-1"><i class="fa-brands fa-figma"></i><span>Figma</span></a>` : ''}
                                 ${proj.whimsical ? `<a href="${proj.whimsical}" target="_blank" class="bg-amber-950/40 text-amber-300 hover:bg-amber-900/50 px-2 py-0.5 rounded border border-amber-800/30 flex items-center space-x-1"><i class="fa-solid fa-compass-drafting"></i><span>Whimsical</span></a>` : ''}
@@ -353,6 +360,7 @@
             document.getElementById('proj-doc').value = proj.doc || '';
             document.getElementById('proj-figma').value = proj.figma || '';
             document.getElementById('proj-whimsical').value = proj.whimsical || '';
+            document.getElementById('proj-ia').value = proj.ia || '';
             document.getElementById('proj-status').value = proj.status || dadosApp.colunas[0].id;
             
             document.getElementById('modal-titulo-projeto').innerHTML = '<i class="fa-solid fa-pen-to-square text-indigo-400"></i><span>Editar Projeto</span>';
@@ -434,6 +442,7 @@
             const doc = document.getElementById('proj-doc').value;
             const figma = document.getElementById('proj-figma').value;
             const whimsical = document.getElementById('proj-whimsical').value;
+            const ia = document.getElementById('proj-ia').value;
             const status = document.getElementById('proj-status').value;
 
             if (idExistente) {
@@ -446,6 +455,7 @@
                     proj.doc = doc;
                     proj.figma = figma;
                     proj.whimsical = whimsical;
+                    proj.ia = ia;
                     proj.status = status;
                 }
             } else {
@@ -461,6 +471,7 @@
                     doc,
                     figma,
                     whimsical,
+                    ia,
                     status,
                     dataCriacao: dataFormatada
                 });
